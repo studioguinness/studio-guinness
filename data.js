@@ -578,7 +578,7 @@ window.PORTFOLIO = {
       "project": "six",
       "titleStatus": "provided",
       "sourceTitle": "THE SIX | The Six Maids — Character PV",
-      "poster": "assets/art-19.webp"
+      "poster": "https://i.ytimg.com/vi/OLDas-qk14I/hqdefault.jpg"
     },
     {
       "youtubeId": "6_sPXqtK844",
@@ -586,7 +586,7 @@ window.PORTFOLIO = {
       "project": "six",
       "titleStatus": "provided",
       "sourceTitle": "EPISODE: SUZU — AFTER HOURS | THE SIX MAIDS",
-      "poster": "assets/art-30.webp",
+      "poster": "https://i.ytimg.com/vi/6_sPXqtK844/hqdefault.jpg",
       "posterSource": "provided-artwork"
     },
     {
@@ -595,7 +595,7 @@ window.PORTFOLIO = {
       "project": "six",
       "titleStatus": "verified-oembed",
       "sourceTitle": "BLITZ OF SIX — THE SIX MAIDS",
-      "poster": "assets/art-04.webp",
+      "poster": "https://i.ytimg.com/vi/dwL_KPfxotU/hqdefault.jpg",
       "posterSource": "provided-artwork"
     },
     {
@@ -604,7 +604,7 @@ window.PORTFOLIO = {
       "project": "six",
       "titleStatus": "verified-oembed",
       "sourceTitle": "THE SIX MAIDS : No.02「LOST & FOUND」｜AI Anime Short Film",
-      "poster": "assets/art-11.webp",
+      "poster": "https://i.ytimg.com/vi/5QB4clhFDeg/hqdefault.jpg",
       "posterSource": "provided-artwork"
     },
     {
@@ -613,7 +613,7 @@ window.PORTFOLIO = {
       "project": "six",
       "titleStatus": "verified-oembed",
       "sourceTitle": "THE SIX MAIDS : No.02「LOST & FOUND」X-EDITION｜AI Anime Short Film",
-      "poster": "assets/art-11.webp",
+      "poster": "https://i.ytimg.com/vi/0FOxR2W_twU/hqdefault.jpg",
       "posterSource": "provided-artwork",
       "description": "X-EDITION"
     },
@@ -623,7 +623,7 @@ window.PORTFOLIO = {
       "project": "gochamaze",
       "titleStatus": "provided",
       "sourceTitle": "ごちゃまぜ！ / GOCHAMAZE!【AI Anime Music Video】｜Studio Guinness",
-      "poster": "assets/art-23.webp"
+      "poster": "https://i.ytimg.com/vi/rZl4Sd4yidQ/hqdefault.jpg"
     }
   ],
   "links": [
