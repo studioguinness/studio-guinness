@@ -13,6 +13,7 @@ const externalLink = (url, label, className='') => {
 
 // Players make no YouTube requests until a visitor chooses to play.
 const players = new Set();
+let musicAudio=null;
 function videoPlayer(film, poster, featured=false) {
   const title = film.title || `VIDEO ID: ${film.youtubeId}`;
   const frame = make('div','video-player');
@@ -34,6 +35,7 @@ function videoPlayer(film, poster, featured=false) {
     if(focus)button.focus({preventScroll:true});
   }
   function playVideo() {
+    musicAudio?.pause();
     for(const other of [...players])other.reset();
     const iframe=make('iframe'); iframe.title=`${title} — YouTube動画プレーヤー`;
     iframe.src=`https://www.youtube-nocookie.com/embed/${encodeURIComponent(film.youtubeId)}?autoplay=1&playsinline=1&rel=0`;
@@ -48,43 +50,68 @@ for(const anchor of document.querySelectorAll('[data-video]')) {
   const film=data.videos.find(v=>v.youtubeId===anchor.dataset.video);
   if(film)anchor.replaceWith(videoPlayer(film,anchor.querySelector('img')?.getAttribute('src')||film.poster,anchor.classList.contains('hero-film')));
 }
-const filmList=document.getElementById('six-films');
-data.videos.filter(v=>v.project==='six').forEach((film,index)=>{
-  const card=make('article','film-card');
-  const header=make('div','film-card-caption');
-  const title=make('h4','',film.title||`VIDEO ID: ${film.youtubeId}`);
-  const count=make('span','film-index',String(index+1).padStart(2,'0')); header.append(count,title);
-  card.append(videoPlayer(film,film.poster),header,externalLink(`https://youtu.be/${film.youtubeId}`,'YouTubeで見る ↗','video-external'));
-  filmList.append(card);
-});
+const filmList=document.getElementById('animation-films');
+let filmIndex=0;
+for(const ids of data.videoRows){
+  const row=make('div',`animation-row columns-${ids.length}`);
+  for(const id of ids){
+    const film=data.videos.find(item=>item.youtubeId===id);
+    if(!film)continue;
+    const card=make('article','film-card');
+    const header=make('div','film-card-caption');
+    const title=make('h3','',film.title||`VIDEO ID: ${film.youtubeId}`);
+    const count=make('span','film-index',String(++filmIndex).padStart(2,'0'));
+    header.append(count,title);
+    card.append(videoPlayer(film,film.poster),header,externalLink(`https://youtu.be/${film.youtubeId}`,'YouTubeで見る ↗','video-external'));
+    row.append(card);
+  }
+  filmList.append(row);
+}
 
 // A stable featured order followed by every other artwork, without duplication.
 const orderedIds=[...new Set([...(data.featuredOrder||[]),...data.artworks.map(a=>a.id)])];
 const artworks=orderedIds.map(id=>data.artworks.find(a=>a.id===id)).filter(Boolean);
-let category='all'; let limit=20; let visible=[];
+const initialCount=data.galleryInitialCount||21;
+let category='all'; let limit=initialCount; let visible=[];
 const grid=document.getElementById('art-grid');
 const filters=document.getElementById('art-filters');
 const status=document.getElementById('gallery-status');
 const more=document.getElementById('load-more');
 const categoryName=id=>data.categories.find(c=>c.id===id)?.label||id;
-const filteredArt=()=>artworks.filter(a=>category==='all'||a.category===category);
+const groupOrder=['film-covers','world-main','world-reserve','world-other','key-square','six-mg','main-posters','six-posters','false-alarm','landscape','portrait-4x3','portrait-9x16','portrait-3x5','other-ratios','six-character','emi-nemu','jackets','records','other-portrait','other-square','other-landscape','other-tall','other'];
+const rank=a=>{const i=groupOrder.indexOf(a.layoutGroup);return i<0?999:i;};
+const filteredArt=()=>{
+  if(category!=='all')return artworks.filter(a=>a.category===category).sort((a,b)=>rank(a)-rank(b));
+  const chosen=new Set((data.featuredOrder||[]).slice(0,initialCount));
+  return [...artworks.filter(a=>chosen.has(a.id)),...artworks.filter(a=>!chosen.has(a.id)).sort((a,b)=>rank(a)-rank(b))];
+};
 for(const item of [{id:'all',label:'ALL WORKS'},...data.categories]) {
   const count=item.id==='all'?artworks.length:artworks.filter(a=>a.category===item.id).length;
   const button=make('button','category-button',`${item.label} `); button.type='button';
   const badge=make('span','filter-count',String(count).padStart(2,'0')); button.append(badge);
   button.dataset.category=item.id; button.setAttribute('aria-pressed',String(item.id===category));
   button.setAttribute('aria-controls','art-grid');
-  button.addEventListener('click',()=>{
-    category=item.id;limit=20;
-    filters.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.category===category)));
-    renderGallery();
-  });
+  button.addEventListener('click',()=>selectCategory(item.id));
   filters.append(button);
+}
+function selectCategory(id){
+  category=id;limit=initialCount;
+  filters.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.category===category)));
+  renderGallery();
+}
+function applyGalleryHash(){
+  if(location.hash==='#character')selectCategory('character');
+  else if(location.hash==='#artwork')selectCategory('all');
+}
+window.addEventListener('hashchange',applyGalleryHash);
+// Repeated clicks on the current anchor also restore its intended filter.
+for(const link of document.querySelectorAll('a[href="#character"],a[href="#artwork"]')){
+  link.addEventListener('click',()=>selectCategory(link.hash==='#character'?'character':'all'));
 }
 function artTile(art,index){
   const figure=make('figure',`art-tile${art.width>art.height?' wide':''}`);
   const button=make('button','art-open'); button.type='button'; button.dataset.artId=art.id;
-  button.setAttribute('aria-label',`${art.title} を拡大表示`);button.setAttribute('aria-haspopup','dialog');
+  button.setAttribute('aria-label',`${art.category==='other'||art.hideTitle ? art.alt : art.title} を拡大表示`);button.setAttribute('aria-haspopup','dialog');
   const img=make('img'); img.src=art.thumbnail||art.src;
   if(art.thumbnail&&art.thumbnailWidth&&art.displayWidth>art.thumbnailWidth){
     img.srcset=`${art.thumbnail} ${art.thumbnailWidth}w, ${art.src} ${art.displayWidth}w`;
@@ -98,11 +125,20 @@ function artTile(art,index){
   const caption=make('figcaption');const label=make('span','art-title');
   label.append(make('span','art-category',categoryName(art.category)),document.createTextNode(art.title));
   caption.append(label,make('span','art-number',String(index+1).padStart(2,'0')));
-  figure.append(button,caption);return figure;
+  figure.append(button);if(art.category!=='other'&&!art.hideTitle)figure.append(caption);return figure;
 }
 function renderGallery(){
   const list=filteredArt(); visible=list.slice(0,limit);
-  grid.replaceChildren(...visible.map(artTile));
+  const rows=[];let row=null;let group='';let count=0;let cols=0;let ratio=0;
+  visible.forEach((art,index)=>{
+    const r=art.width/art.height;const g=art.layoutGroup||art.category;
+    if(!row||group!==g||count>=cols||Math.abs(ratio-r)>.03){
+      cols=r>1.2?3:Math.abs(r-1)<.06?4:3;ratio=r;group=g;count=0;
+      row=make('div',`art-row art-row-${cols}${r>1.2?' landscape':' portrait'}`);
+      row.style.setProperty('--art-ratio',String(r));rows.push(row);
+    }
+    row.append(artTile(art,index));count++;
+  });grid.replaceChildren(...rows);
   status.textContent=`${visible.length} / ${list.length} WORKS`;
   more.hidden=visible.length>=list.length;
   more.textContent=`残り${list.length-visible.length}点を表示 ↓`;
@@ -125,7 +161,10 @@ function openLightbox(id,trigger){
 function updateLightbox(){
   const art=lightboxItems[lightboxIndex];
   lightboxImage.src=art.src;lightboxImage.alt=art.alt;
-  document.getElementById('lightbox-title').textContent=art.title;
+  const title=document.getElementById('lightbox-title');
+  const hideTitle=art.category==='other'||art.hideTitle;
+  title.textContent=hideTitle?'作品の拡大表示':art.title;
+  title.classList.toggle('visually-hidden',!!hideTitle);
   document.getElementById('lightbox-category').textContent=categoryName(art.category);
   document.getElementById('lightbox-position').textContent=`${lightboxIndex+1} / ${lightboxItems.length}`;
   prev.disabled=lightboxItems.length<2;next.disabled=lightboxItems.length<2;
@@ -146,6 +185,7 @@ dialog.addEventListener('keydown',event=>{
 });
 dialog.addEventListener('close',()=>{document.body.classList.remove('modal-open');lightboxImage.removeAttribute('src');if(opener?.isConnected)opener.focus({preventScroll:true});});
 renderGallery();
+applyGalleryHash();
 
 const officialLinks=document.getElementById('official-links');
 data.links.filter(link=>link.url&&/^https:\/\//.test(link.url)).forEach(link=>officialLinks.append(externalLink(link.url,`${link.label} ↗`,'text-link')));
