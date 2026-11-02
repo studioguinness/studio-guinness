@@ -2484,6 +2484,21 @@ window.PORTFOLIO = {
       "thumbnailWidth": 720,
       "src": "assets/additions/addition-d62d2f6d75a3.webp",
       "thumbnail": "assets/additions/thumbs/addition-d62d2f6d75a3.webp"
+    },
+    {
+      "id": "work-fb8952729c",
+      "title": "DARK SWAN",
+      "originalFilename": "DARK-SWAN.jpg",
+      "originalPath": "MUSIC/ジャケット/DARK-SWAN.jpg",
+      "category": "sound",
+      "layoutGroup": "jackets",
+      "alt": "DARK SWAN / Studio Guinness",
+      "src": "assets/revision/work-fb8952729c.webp",
+      "thumbnail": "assets/revision/thumbs/work-fb8952729c.webp",
+      "width": 1024,
+      "height": 1024,
+      "displayWidth": 1024,
+      "thumbnailWidth": 720
     }
   ],
   "videos": [
@@ -2629,6 +2644,16 @@ window.PORTFOLIO = {
     ]
   ],
   "music": [
+    {
+      "id": "track-16",
+      "title": "DARK SWAN",
+      "artist": "STUDIO GUINNESS",
+      "src": "assets/revision/audio/track-16.mp3",
+      "cover": "assets/revision/work-fb8952729c.webp",
+      "thumbnail": "assets/revision/thumbs/work-fb8952729c.webp",
+      "duration": 292.76,
+      "originalFilename": "DARK_SWAN.mp3"
+    },
     {
       "id": "track-01",
       "title": "Ⅵ",
